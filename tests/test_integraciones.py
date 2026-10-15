@@ -215,3 +215,25 @@ def test_adaptador_compatible_ejecuta_herramientas():
     assert r.llamadas[0].argumentos == {"consulta": "fierro de media"}
     assert completions.kwargs["tool_choice"] == "none" and completions.kwargs["model"] == "gemini-3.8-flash"
     assert completions.kwargs["messages"][0]["content"] == "estable\n\nturno"
+
+
+def test_politica_de_privacidad_con_datos_de_la_empresa(config):
+    from dataclasses import replace
+
+    from cotizador.privacidad import pagina_privacidad
+
+    empresa = replace(config.empresa, nombre="Aceros <Ñandú> & Cía", email="ventas@ejemplo.pe", ruc="20123456789")
+    html = pagina_privacidad(replace(config, empresa=empresa, llm_proveedor="gemini"))
+    assert "Aceros &lt;Ñandú&gt; &amp; Cía" in html and "<Ñandú>" not in html  # escapado
+    assert "RUC 20123456789" in html and "mailto:ventas@ejemplo.pe" in html
+    assert "Google (modelo Gemini)" in html and "Ley N.° 29733" in html and 'id="eliminacion"' in html
+
+
+def test_ruta_de_privacidad_responde_html():
+    import azure.functions as func
+
+    import function_app
+
+    r = function_app.privacidad(func.HttpRequest("GET", "/api/privacidad", body=b""))
+    assert r.status_code == 200 and r.mimetype == "text/html"
+    assert "Política de privacidad" in r.get_body().decode("utf-8")

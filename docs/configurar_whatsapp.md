@@ -46,11 +46,13 @@ Vuelve a correr `./infra/deploy.sh` para cargar estos valores en Azure.
 
 ## 5. Webhook
 
-1. En la app → **WhatsApp** → **Configuración** → **Webhook** → **Editar**.
+1. En la app → **Casos de uso** → *Conectar en WhatsApp* → **Personalizar** → **Paso 2. Configuración de producción** → **Configurar Webhooks**. (En paneles antiguos: **WhatsApp** → **Configuración** → **Webhook**.)
 2. **URL de devolución de llamada**: la URL del webhook. **Token de verificación**: `WA_VERIFY_TOKEN`.
 3. **Verificar y guardar**. Si falla, revisa `https://…/api/salud` y que el token coincida.
 4. En *Campos del webhook*, suscribe `messages` (y `smb_message_echoes` si usas coexistencia). El campo `messages` también trae los estados de entrega: si un mensaje al cliente falla (por ejemplo, por la ventana de 24 h), el vendedor recibe un aviso.
-5. Pasa la app a modo **Live** (requiere la URL de política de privacidad).
+5. **Publica la app** (obligatorio). Mientras la app está *sin publicar*, Meta solo muestra los mensajes en el panel (*Paso 1 → Comprobar webhooks de prueba*) y **no los envía al bot**, ni siquiera los de administradores o evaluadores:
+   - En **Configuración de la aplicación → Información básica**, pon como *URL de la Política de privacidad* la que sirve el propio bot: `https://<function-app>.azurewebsites.net/api/privacidad` (se arma con los datos `EMPRESA_*`; que el área legal del cliente la revise). Guarda los cambios.
+   - En **Publicar**, publica la app. El número de prueba sigue funcionando.
 
 ## 6. Prueba
 

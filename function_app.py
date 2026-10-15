@@ -4,6 +4,7 @@
   cola     mensajes-entrantes      -> procesa cada conversación con el agente
   timer    08:00 Lima              -> actualiza el tipo de cambio del BCRP
   GET      /api/salud              -> chequeo rápido
+  GET      /api/privacidad         -> política de privacidad pública (requisito de Meta para publicar la app)
   GET      /api/admin/cotizaciones -> CSV para Excel / Power BI   (requiere clave de función)
   GET/POST /api/admin/catalogo     -> descargar / cargar la lista de precios (requiere clave de función)
 """
@@ -16,6 +17,7 @@ import azure.functions as func
 
 from cotizador import __version__, cargar_config, crear_servicio
 from cotizador.catalogo import a_csv
+from cotizador.privacidad import pagina_privacidad
 from cotizador.whatsapp import verificar_firma
 
 app = func.FunctionApp()
@@ -92,6 +94,12 @@ def salud(req: func.HttpRequest) -> func.HttpResponse:
         "admins": len(config.admin_numeros),
     }
     return func.HttpResponse(json.dumps(estado), mimetype="application/json")
+
+
+@app.route(route="privacidad", methods=["GET"], auth_level=func.AuthLevel.ANONYMOUS)
+def privacidad(req: func.HttpRequest) -> func.HttpResponse:
+    """Política de privacidad pública (Meta la exige para publicar la app)."""
+    return func.HttpResponse(pagina_privacidad(cargar_config()), mimetype="text/html", charset="utf-8")
 
 
 @app.route(route="admin/cotizaciones", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
