@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 
@@ -59,6 +60,21 @@ PROVEEDORES_COMPATIBLES: dict[str, tuple[str, str, str]] = {
     "deepseek": ("https://api.deepseek.com", "deepseek-flash", "DEEPSEEK_API_KEY"),
     "openai_compatible": ("", "", "LLM_API_KEY"),
 }
+
+# Modelo de respaldo por defecto: se usa si el principal está saturado (503/429...). LLM_MODELO_RESPALDO lo cambia.
+MODELOS_RESPALDO: dict[str, str] = {"gemini": "gemini-3.5-flash-lite"}
+
+# Tras una saturación, el modelo principal se deja descansar este tiempo y se va directo al respaldo.
+SEGUNDOS_PAUSA_PRINCIPAL = 600
+_ESTADOS_SATURACION = {408, 429, 500, 502, 503, 504, 529}
+_pausados_hasta: dict[str, float] = {}
+
+
+def _es_saturacion(exc: Exception) -> bool:
+    """Errores pasajeros del proveedor (saturación, límite de uso, caída), no errores de la petición."""
+    if getattr(exc, "status_code", None) in _ESTADOS_SATURACION:
+        return True
+    return type(exc).__name__ in {"APIConnectionError", "APITimeoutError", "RateLimitError", "InternalServerError"}
 
 
 # ============================================================ Anthropic
@@ -140,10 +156,27 @@ class LLMFormatoOpenAI:
     """Base para cualquier API con el formato de chat completions de OpenAI."""
     soporta_pdf = False
 
-    def __init__(self, cliente: Any, modelo: str, max_tokens: int):
+    def __init__(self, cliente: Any, modelo: str, max_tokens: int, modelo_respaldo: str = ""):
         self.cliente = cliente
         self.modelo = modelo
         self.max_tokens = max_tokens
+        self.modelo_respaldo = modelo_respaldo if modelo_respaldo != modelo else ""
+
+    def _crear(self, **kwargs: Any) -> Any:
+        """Llama al modelo principal; si está saturado y hay respaldo, responde con el respaldo."""
+        if not self.modelo_respaldo:
+            return self.cliente.chat.completions.create(model=self.modelo, **kwargs)
+        if time.monotonic() < _pausados_hasta.get(self.modelo, 0):
+            return self.cliente.chat.completions.create(model=self.modelo_respaldo, **kwargs)
+        try:
+            return self.cliente.chat.completions.create(model=self.modelo, **kwargs)
+        except Exception as exc:
+            if not _es_saturacion(exc):
+                raise
+            log.warning("Modelo %s no disponible (%s); se usa %s por %s min", self.modelo, exc,
+                        self.modelo_respaldo, SEGUNDOS_PAUSA_PRINCIPAL // 60)
+            _pausados_hasta[self.modelo] = time.monotonic() + SEGUNDOS_PAUSA_PRINCIPAL
+            return self.cliente.chat.completions.create(model=self.modelo_respaldo, **kwargs)
 
     @staticmethod
     def convertir(sistema: str | list[str], mensajes: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -184,8 +217,8 @@ class LLMFormatoOpenAI:
             extra["tool_choice"] = "none"
         max_tokens = self.max_tokens
         for _ in range(2):
-            r = self.cliente.chat.completions.create(model=self.modelo, messages=self.convertir(sistema, mensajes),
-                                                     max_tokens=max_tokens, temperature=0.2, **extra)
+            r = self._crear(messages=self.convertir(sistema, mensajes), max_tokens=max_tokens, temperature=0.2,
+                            **extra)
             if r.choices[0].finish_reason != "length":
                 break
             max_tokens *= 2
@@ -220,8 +253,11 @@ class LLMCompatibleOpenAI(LLMFormatoOpenAI):
         if cliente is None:
             from openai import OpenAI
 
-            cliente = OpenAI(api_key=config.llm_api_key, base_url=config.llm_base_url, max_retries=2, timeout=60)
-        super().__init__(cliente, config.llm_modelo, config.llm_max_tokens)
+            # Con respaldo, un solo reintento: es más rápido pasar al otro modelo que insistir con uno saturado.
+            reintentos = 1 if config.llm_modelo_respaldo else 2
+            cliente = OpenAI(api_key=config.llm_api_key, base_url=config.llm_base_url, max_retries=reintentos,
+                             timeout=60)
+        super().__init__(cliente, config.llm_modelo, config.llm_max_tokens, config.llm_modelo_respaldo)
 
 
 # ============================================================ audio

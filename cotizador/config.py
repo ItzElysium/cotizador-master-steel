@@ -115,6 +115,7 @@ class Config:
     # IA
     llm_proveedor: str = "anthropic"   # anthropic | azure_openai | gemini | deepseek | openai_compatible
     llm_modelo: str = "claude-haiku-5-5"
+    llm_modelo_respaldo: str = ""      # se usa si el principal está saturado (ej. Gemini gratis)
     llm_max_tokens: int = 1500
     anthropic_api_key: str = ""
     llm_api_key: str = ""              # proveedores compatibles con OpenAI (Gemini, DeepSeek...)
@@ -175,13 +176,16 @@ def cargar_config() -> Config:
         almacen = "azure" if (_env("STORAGE_CONNECTION_STRING") or _env("STORAGE_ACCOUNT_NAME")) else "memoria"
 
     proveedor = _env("LLM_PROVEEDOR", "anthropic").lower()
-    from .llm import PROVEEDORES_COMPATIBLES  # import tardío: llm.py importa Config
+    from .llm import MODELOS_RESPALDO, PROVEEDORES_COMPATIBLES  # import tardío: llm.py importa Config
 
     base_url, modelo_defecto, var_clave = PROVEEDORES_COMPATIBLES.get(proveedor, ("", "", "LLM_API_KEY"))
     if proveedor == "anthropic":
         modelo_defecto = "claude-haiku-5-5"
     elif proveedor == "azure_openai":
         modelo_defecto = ""
+    respaldo = _env("LLM_MODELO_RESPALDO", MODELOS_RESPALDO.get(proveedor, "")) or MODELOS_RESPALDO.get(proveedor, "")
+    if respaldo.lower() == "ninguno":
+        respaldo = ""
 
     return Config(
         empresa=empresa,
@@ -213,6 +217,7 @@ def cargar_config() -> Config:
         wa_plantilla_idioma=_env("WA_PLANTILLA_IDIOMA", "es"),
         llm_proveedor=proveedor,
         llm_modelo=_env("LLM_MODELO", modelo_defecto) or modelo_defecto,
+        llm_modelo_respaldo=respaldo,
         llm_max_tokens=_env_int("LLM_MAX_TOKENS", 1500),
         anthropic_api_key=_env("ANTHROPIC_API_KEY"),
         llm_api_key=_env(var_clave) or _env("LLM_API_KEY"),

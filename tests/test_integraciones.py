@@ -4,6 +4,8 @@ import hmac
 import json
 from decimal import Decimal
 
+import pytest
+
 from conftest import RESPUESTA_BCRP, FakeHttp
 from cotizador.almacenamiento import RepositorioMemoria, _partir, _unir, clave_segura
 from cotizador.llm import LLMAnthropic, LLMAzureOpenAI
@@ -147,9 +149,48 @@ def test_proveedores_compatibles_con_openai(monkeypatch):
     assert isinstance(llm, LLMCompatibleOpenAI) and llm.modelo == "gemini-3.8-flash"
     assert str(llm.cliente.base_url).startswith("https://generativelanguage.googleapis.com/v1beta/openai")
 
+    assert llm.modelo_respaldo == "gemini-3.5-flash-lite"
+
     monkeypatch.setenv("LLM_PROVEEDOR", "deepseek")
     monkeypatch.setenv("DEEPSEEK_API_KEY", "otra-clave")
-    assert crear_llm(cargar_config()).modelo == "deepseek-flash"
+    deepseek = crear_llm(cargar_config())
+    assert deepseek.modelo == "deepseek-flash" and deepseek.modelo_respaldo == ""
+
+
+def test_modelo_saturado_pasa_al_respaldo_y_descansa(monkeypatch):
+    from types import SimpleNamespace as N
+
+    from cotizador import llm as modulo
+
+    class Saturado(Exception):
+        status_code = 503
+
+    class Invalido(Exception):
+        status_code = 400
+
+    class Completions:
+        def __init__(self, error):
+            self.modelos, self.error = [], error
+
+        def create(self, **kwargs):
+            self.modelos.append(kwargs["model"])
+            if kwargs["model"] == "principal":
+                raise self.error
+            return N(choices=[N(finish_reason="stop", message=N(content="hola", tool_calls=None))], usage=None)
+
+    monkeypatch.setattr(modulo, "_pausados_hasta", {})
+    completions = Completions(Saturado("503 UNAVAILABLE"))
+    llm = modulo.LLMFormatoOpenAI(N(chat=N(completions=completions)), "principal", 500, "respaldo")
+    assert llm.completar("s", NEUTRO, []).texto == "hola"
+    assert llm.completar("s", NEUTRO, []).texto == "hola"
+    # 1er turno: principal falla -> respaldo. 2do turno: va directo al respaldo (el principal descansa).
+    assert completions.modelos == ["principal", "respaldo", "respaldo"]
+
+    # Un error de la petición (400) no se esconde con el respaldo.
+    monkeypatch.setattr(modulo, "_pausados_hasta", {})
+    malo = modulo.LLMFormatoOpenAI(N(chat=N(completions=Completions(Invalido("400")))), "principal", 500, "respaldo")
+    with pytest.raises(Invalido):
+        malo.completar("s", NEUTRO, [])
 
 
 def test_adaptador_compatible_ejecuta_herramientas():
