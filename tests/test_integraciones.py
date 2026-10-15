@@ -133,3 +133,44 @@ def test_pdf_se_genera_con_caracteres_especiales(config):
 
 def test_sin_app_secret_se_rechaza_todo():
     assert not verificar_firma(b"{}", "sha256=abc", "")
+
+
+def test_proveedores_compatibles_con_openai(monkeypatch):
+    from cotizador.config import cargar_config
+    from cotizador.llm import LLMCompatibleOpenAI, crear_llm
+
+    monkeypatch.setenv("LLM_PROVEEDOR", "gemini")
+    monkeypatch.setenv("GEMINI_API_KEY", "clave-de-prueba")
+    monkeypatch.delenv("LLM_MODELO", raising=False)
+    config = cargar_config()
+    llm = crear_llm(config)
+    assert isinstance(llm, LLMCompatibleOpenAI) and llm.modelo == "gemini-3.8-flash"
+    assert str(llm.cliente.base_url).startswith("https://generativelanguage.googleapis.com/v1beta/openai")
+
+    monkeypatch.setenv("LLM_PROVEEDOR", "deepseek")
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "otra-clave")
+    assert crear_llm(cargar_config()).modelo == "deepseek-flash"
+
+
+def test_adaptador_compatible_ejecuta_herramientas():
+    from types import SimpleNamespace as N
+
+    from cotizador.llm import LLMFormatoOpenAI
+
+    class Completions:
+        def __init__(self):
+            self.kwargs = None
+
+        def create(self, **kwargs):
+            self.kwargs = kwargs
+            llamada = N(id="c1", function=N(name="buscar_productos", arguments='{"consulta": "fierro de media"}'))
+            return N(choices=[N(finish_reason="tool_calls", message=N(content=None, tool_calls=[llamada]))],
+                     usage=N(prompt_tokens=10, completion_tokens=5))
+
+    completions = Completions()
+    llm = LLMFormatoOpenAI(N(chat=N(completions=completions)), "gemini-3.8-flash", 500)
+    r = llm.completar(["estable", "turno"], NEUTRO, [{"nombre": "buscar_productos", "descripcion": "d",
+                                                       "parametros": {"type": "object"}}], forzar_texto=True)
+    assert r.llamadas[0].argumentos == {"consulta": "fierro de media"}
+    assert completions.kwargs["tool_choice"] == "none" and completions.kwargs["model"] == "gemini-3.8-flash"
+    assert completions.kwargs["messages"][0]["content"] == "estable\n\nturno"

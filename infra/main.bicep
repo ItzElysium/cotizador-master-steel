@@ -37,7 +37,7 @@ param prefijoTablas string = ''
 @description('App settings no secretos: EMPRESA_*, MODO_ENVIO, ADMIN_NUMEROS, LLM_PROVEEDOR, etc.')
 param configuracion object = {}
 
-@description('App settings secretos: ANTHROPIC_API_KEY, WA_TOKEN, WA_APP_SECRET, WA_VERIFY_TOKEN, AZURE_OPENAI_API_KEY.')
+@description('App settings secretos: claves de IA (ANTHROPIC/GEMINI/DEEPSEEK/AZURE_OPENAI/LLM_API_KEY) y de WhatsApp.')
 @secure()
 param secretos object = {}
 

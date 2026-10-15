@@ -14,7 +14,7 @@ GRUPO="${1:-rg-cotizador-acero}"
 REGION="${2:-eastus}"
 ENV_FILE="${3:-infra/.env}"
 NOMBRE="${NOMBRE:-cotizador}"
-SECRETOS="ANTHROPIC_API_KEY AZURE_OPENAI_API_KEY WA_TOKEN WA_APP_SECRET WA_VERIFY_TOKEN"
+SECRETOS="ANTHROPIC_API_KEY AZURE_OPENAI_API_KEY GEMINI_API_KEY DEEPSEEK_API_KEY LLM_API_KEY WA_TOKEN WA_APP_SECRET WA_VERIFY_TOKEN"
 
 [[ -f "$ENV_FILE" ]] || { echo "No existe $ENV_FILE (copia infra/.env.example)"; exit 1; }
 command -v az >/dev/null || { echo "Instala Azure CLI: https://aka.ms/azcli"; exit 1; }

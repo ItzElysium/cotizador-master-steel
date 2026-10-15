@@ -22,7 +22,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$Secretos = @("ANTHROPIC_API_KEY", "AZURE_OPENAI_API_KEY", "WA_TOKEN", "WA_APP_SECRET", "WA_VERIFY_TOKEN")
+$Secretos = @("ANTHROPIC_API_KEY", "AZURE_OPENAI_API_KEY", "GEMINI_API_KEY", "DEEPSEEK_API_KEY", "LLM_API_KEY",
+    "WA_TOKEN", "WA_APP_SECRET", "WA_VERIFY_TOKEN")
 $Raiz = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 Set-Location $Raiz
 

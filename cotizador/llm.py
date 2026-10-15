@@ -6,6 +6,8 @@ traducen al proveedor elegido:
 - Anthropic (Claude) vía API directa  -> LLM_PROVEEDOR=anthropic
 - Azure OpenAI (GPT-4o / 4.1 mini...) -> LLM_PROVEEDOR=azure_openai
 
+- Gemini, DeepSeek u otro compatible con OpenAI -> LLM_PROVEEDOR=gemini | deepseek | openai_compatible
+
 Formato neutro:
   {"rol": "usuario", "contenido": [{"tipo": "texto", "texto": ...},
                                     {"tipo": "imagen", "media_type": "image/jpeg", "datos_b64": ...},
@@ -49,6 +51,14 @@ class ProveedorLLM(Protocol):
 
 def _partes(sistema: str | list[str]) -> list[str]:
     return [sistema] if isinstance(sistema, str) else [s for s in sistema if s]
+
+
+# Proveedores con endpoint compatible con OpenAI: (base_url, modelo por defecto, variable de la clave)
+PROVEEDORES_COMPATIBLES: dict[str, tuple[str, str, str]] = {
+    "gemini": ("https://generativelanguage.googleapis.com/v1beta/openai/", "gemini-3.8-flash", "GEMINI_API_KEY"),
+    "deepseek": ("https://api.deepseek.com", "deepseek-flash", "DEEPSEEK_API_KEY"),
+    "openai_compatible": ("", "", "LLM_API_KEY"),
+}
 
 
 # ============================================================ Anthropic
@@ -124,20 +134,16 @@ class LLMAnthropic:
         return RespuestaLLM(texto=texto, llamadas=llamadas, uso=uso)
 
 
-# ============================================================ Azure OpenAI
+# ============================================================ formato OpenAI (Azure, Gemini, DeepSeek...)
 
-class LLMAzureOpenAI:
+class LLMFormatoOpenAI:
+    """Base para cualquier API con el formato de chat completions de OpenAI."""
     soporta_pdf = False
 
-    def __init__(self, config: Config, cliente: Any = None):
-        if cliente is None:
-            from openai import AzureOpenAI
-
-            cliente = AzureOpenAI(api_key=config.azure_openai_api_key, api_version=config.azure_openai_api_version,
-                                  azure_endpoint=config.azure_openai_endpoint, max_retries=2, timeout=60)
+    def __init__(self, cliente: Any, modelo: str, max_tokens: int):
         self.cliente = cliente
-        self.deployment = config.azure_openai_deployment
-        self.max_tokens = config.llm_max_tokens
+        self.modelo = modelo
+        self.max_tokens = max_tokens
 
     @staticmethod
     def convertir(sistema: str | list[str], mensajes: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -178,7 +184,7 @@ class LLMAzureOpenAI:
             extra["tool_choice"] = "none"
         max_tokens = self.max_tokens
         for _ in range(2):
-            r = self.cliente.chat.completions.create(model=self.deployment, messages=self.convertir(sistema, mensajes),
+            r = self.cliente.chat.completions.create(model=self.modelo, messages=self.convertir(sistema, mensajes),
                                                      max_tokens=max_tokens, temperature=0.2, **extra)
             if r.choices[0].finish_reason != "length":
                 break
@@ -195,6 +201,27 @@ class LLMAzureOpenAI:
         if getattr(r, "usage", None):
             uso = {"entrada": r.usage.prompt_tokens or 0, "salida": r.usage.completion_tokens or 0}
         return RespuestaLLM(texto=(msg.content or "").strip(), llamadas=llamadas, uso=uso)
+
+
+class LLMAzureOpenAI(LLMFormatoOpenAI):
+    def __init__(self, config: Config, cliente: Any = None):
+        if cliente is None:
+            from openai import AzureOpenAI
+
+            cliente = AzureOpenAI(api_key=config.azure_openai_api_key, api_version=config.azure_openai_api_version,
+                                  azure_endpoint=config.azure_openai_endpoint, max_retries=2, timeout=60)
+        super().__init__(cliente, config.azure_openai_deployment, config.llm_max_tokens)
+
+
+class LLMCompatibleOpenAI(LLMFormatoOpenAI):
+    """Gemini (tiene capa gratuita), DeepSeek, Groq, OpenRouter, etc. vía su endpoint compatible con OpenAI."""
+
+    def __init__(self, config: Config, cliente: Any = None):
+        if cliente is None:
+            from openai import OpenAI
+
+            cliente = OpenAI(api_key=config.llm_api_key, base_url=config.llm_base_url, max_retries=2, timeout=60)
+        super().__init__(cliente, config.llm_modelo, config.llm_max_tokens)
 
 
 # ============================================================ audio
@@ -219,6 +246,8 @@ class TranscriptorAzureOpenAI:
 def crear_llm(config: Config) -> ProveedorLLM:
     if config.llm_proveedor == "azure_openai":
         return LLMAzureOpenAI(config)
+    if config.llm_proveedor in PROVEEDORES_COMPATIBLES:
+        return LLMCompatibleOpenAI(config)
     return LLMAnthropic(config)
 
 

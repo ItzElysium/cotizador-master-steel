@@ -91,7 +91,7 @@ En el simulador puedes escribir como cliente ("hola, cuánto está el fierro de 
 |---|---|---|
 | `MODO_ENVIO` | `aprobacion` (el vendedor revisa) o `automatico` | `aprobacion` |
 | `ADMIN_NUMEROS` | WhatsApp de vendedores/administradores | `51999888777` |
-| `LLM_PROVEEDOR` / `LLM_MODELO` | `anthropic` (Claude) o `azure_openai` | `claude-haiku-5-5` |
+| `LLM_PROVEEDOR` / `LLM_MODELO` | `anthropic` (Claude), `gemini` (capa gratuita para pruebas), `deepseek`, `azure_openai` u `openai_compatible` | `claude-haiku-5-5` |
 | `DESCUENTOS_TIPO_CLIENTE` | % por tipo de cliente | `maestro:0.02,ferreteria:0.05` |
 | `DESCUENTOS_VOLUMEN_KG` | % por peso total del pedido | `1000:0.02,5000:0.04` |
 | `DESCUENTO_MAXIMO` | Tope para proteger el margen | `0.08` |

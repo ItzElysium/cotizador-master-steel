@@ -113,10 +113,12 @@ class Config:
     wa_plantilla_idioma: str = "es"
 
     # IA
-    llm_proveedor: str = "anthropic"   # anthropic | azure_openai
+    llm_proveedor: str = "anthropic"   # anthropic | azure_openai | gemini | deepseek | openai_compatible
     llm_modelo: str = "claude-haiku-5-5"
     llm_max_tokens: int = 1500
     anthropic_api_key: str = ""
+    llm_api_key: str = ""              # proveedores compatibles con OpenAI (Gemini, DeepSeek...)
+    llm_base_url: str = ""
     azure_openai_endpoint: str = ""
     azure_openai_api_key: str = ""
     azure_openai_api_version: str = "2024-10-21"
@@ -172,6 +174,15 @@ def cargar_config() -> Config:
     if not almacen:
         almacen = "azure" if (_env("STORAGE_CONNECTION_STRING") or _env("STORAGE_ACCOUNT_NAME")) else "memoria"
 
+    proveedor = _env("LLM_PROVEEDOR", "anthropic").lower()
+    from .llm import PROVEEDORES_COMPATIBLES  # import tardío: llm.py importa Config
+
+    base_url, modelo_defecto, var_clave = PROVEEDORES_COMPATIBLES.get(proveedor, ("", "", "LLM_API_KEY"))
+    if proveedor == "anthropic":
+        modelo_defecto = "claude-haiku-5-5"
+    elif proveedor == "azure_openai":
+        modelo_defecto = ""
+
     return Config(
         empresa=empresa,
         igv_tasa=_env_dec("IGV_TASA", "0.18"),
@@ -200,10 +211,12 @@ def cargar_config() -> Config:
         wa_graph_version=_env("WA_GRAPH_VERSION", "v23.0"),
         wa_plantilla_aprobacion=_env("WA_PLANTILLA_APROBACION"),
         wa_plantilla_idioma=_env("WA_PLANTILLA_IDIOMA", "es"),
-        llm_proveedor=_env("LLM_PROVEEDOR", "anthropic").lower(),
-        llm_modelo=_env("LLM_MODELO", "claude-haiku-5-5"),
+        llm_proveedor=proveedor,
+        llm_modelo=_env("LLM_MODELO", modelo_defecto) or modelo_defecto,
         llm_max_tokens=_env_int("LLM_MAX_TOKENS", 1500),
         anthropic_api_key=_env("ANTHROPIC_API_KEY"),
+        llm_api_key=_env(var_clave) or _env("LLM_API_KEY"),
+        llm_base_url=_env("LLM_BASE_URL", base_url) or base_url,
         azure_openai_endpoint=_env("AZURE_OPENAI_ENDPOINT"),
         azure_openai_api_key=_env("AZURE_OPENAI_API_KEY"),
         azure_openai_api_version=_env("AZURE_OPENAI_API_VERSION", "2024-10-21"),
