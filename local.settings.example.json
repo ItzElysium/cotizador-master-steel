@@ -1,0 +1,24 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "ALMACEN": "azure",
+    "STORAGE_CONNECTION_STRING": "UseDevelopmentStorage=true",
+
+    "EMPRESA_NOMBRE": "Master Steel",
+    "EMPRESA_LEMA": "Los Maestros del Acero",
+    "EMPRESA_DIRECCION": "Callao, Perú",
+    "ADMIN_NUMEROS": "51999888777",
+    "MODO_ENVIO": "aprobacion",
+
+    "WA_TOKEN": "",
+    "WA_PHONE_NUMBER_ID": "",
+    "WA_APP_SECRET": "",
+    "WA_VERIFY_TOKEN": "elige-un-token-largo",
+
+    "LLM_PROVEEDOR": "anthropic",
+    "LLM_MODELO": "claude-haiku-5-5",
+    "ANTHROPIC_API_KEY": ""
+  }
+}

@@ -1,0 +1,23 @@
+# Secretos y configuración local
+local.settings.json
+infra/.env
+*.env
+!infra/.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# Salidas locales
+salida/
+__azurite_db*
+__blobstorage__/
+__queuestorage__/
+
+# Editor / SO
+.vscode/
+.idea/
+.DS_Store

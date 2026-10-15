@@ -1,0 +1,55 @@
+name: Desplegar en Azure Functions
+
+# Requiere (Settings > Secrets and variables > Actions):
+#   secrets:   AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID   (OIDC, sin contraseñas)
+#   variables: AZURE_FUNCTIONAPP_NAME                                     (salida de infra/deploy.sh)
+# Ver docs/despliegue_azure.md para crear la identidad de GitHub.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["docs/**", "**.md", "infra/**"]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-produccion
+  cancel-in-progress: false
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - run: python -m pytest -q
+
+  desplegar:
+    needs: pruebas
+    runs-on: ubuntu-latest
+    environment: produccion
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Publicar en Flex Consumption (build remoto)
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ vars.AZURE_FUNCTIONAPP_NAME }}
+          package: .
+          sku: flexconsumption
+          remote-build: true
+      - name: Verificar salud
+        run: |
+          sleep 20
+          curl --fail --silent --show-error "https://${{ vars.AZURE_FUNCTIONAPP_NAME }}.azurewebsites.net/api/salud"

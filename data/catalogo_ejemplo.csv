@@ -1,0 +1,54 @@
+sku,categoria,descripcion,sinonimos,unidad,peso_kg,precio_usd,base_precio,stock,actualizado
+FC-M06,Fierro corrugado,Fierro corrugado 6 mm x 9 m ASTM A615 Gr60,fierro 6 mm|fierro de 6|varilla 6 mm|corrugado 6 mm,varilla 9 m,2.00,1.90,unidad,disponible,2026-10-12
+FC-M08,Fierro corrugado,Fierro corrugado 8 mm x 9 m ASTM A615 Gr60,fierro 8 mm|fierro de 8|varilla 8 mm|corrugado 8 mm,varilla 9 m,3.56,3.38,unidad,disponible,2026-10-12
+FC-0375,Fierro corrugado,"Fierro corrugado 3/8"" x 9 m ASTM A615 Gr60",fierro 3/8|fierro de tres octavos|varilla 3/8|corrugado 3/8,varilla 9 m,5.04,4.79,unidad,disponible,2026-10-12
+FC-M12,Fierro corrugado,Fierro corrugado 12 mm x 9 m ASTM A615 Gr60,fierro 12 mm|fierro de 12|varilla 12 mm|corrugado 12 mm,varilla 9 m,7.99,7.59,unidad,disponible,2026-10-12
+FC-0500,Fierro corrugado,"Fierro corrugado 1/2"" x 9 m ASTM A615 Gr60",fierro 1/2|fierro de media|fierro media pulgada|varilla 1/2|corrugado 1/2,varilla 9 m,8.95,8.50,unidad,disponible,2026-10-12
+FC-0625,Fierro corrugado,"Fierro corrugado 5/8"" x 9 m ASTM A615 Gr60",fierro 5/8|fierro de cinco octavos|varilla 5/8|corrugado 5/8,varilla 9 m,13.97,13.27,unidad,disponible,2026-10-12
+FC-0750,Fierro corrugado,"Fierro corrugado 3/4"" x 9 m ASTM A615 Gr60",fierro 3/4|fierro de tres cuartos|varilla 3/4|corrugado 3/4,varilla 9 m,20.12,19.11,unidad,disponible,2026-10-12
+FC-1000,Fierro corrugado,"Fierro corrugado 1"" x 9 m ASTM A615 Gr60",fierro 1 pulg|fierro de una pulgada|varilla 1 pulgada|corrugado 1 pulgada,varilla 9 m,35.76,33.97,unidad,consultar,2026-10-12
+BL-0375,Barra lisa,"Barra lisa redonda 3/8"" x 6 m",fierro liso 3/8|barra lisa 3/8|varilla lisa 3/8,barra 6 m,3.36,3.53,unidad,disponible,2026-10-12
+BL-0500,Barra lisa,"Barra lisa redonda 1/2"" x 6 m",fierro liso 1/2|barra lisa 1/2|varilla lisa 1/2|fierro liso de media,barra 6 m,5.96,6.26,unidad,disponible,2026-10-12
+BL-0625,Barra lisa,"Barra lisa redonda 5/8"" x 6 m",fierro liso 5/8|barra lisa 5/8|varilla lisa 5/8,barra 6 m,9.31,9.78,unidad,disponible,2026-10-12
+BC-0500,Barra lisa,"Barra cuadrada 1/2"" x 6 m",barra cuadrada 1/2|fierro cuadrado 1/2|cuadrado macizo 1/2,barra 6 m,7.60,7.98,unidad,disponible,2026-10-12
+AL-16,Alambre,Alambre negro recocido N°16,alambre 16|alambre de amarre|alambre recocido|alambre negro 16|alambre n 16,kg,1.00,1.25,kg,disponible,2026-10-12
+AL-08,Alambre,Alambre negro recocido N°8,alambre 8|alambre n 8|alambre negro 8|alambre grueso,kg,1.00,1.25,kg,disponible,2026-10-12
+PF-090,Plancha LAF,Plancha LAF (laminada en frío) 0.9 mm 1.20 x 2.40 m,plancha laf 0.9 mm|plancha negra 0.9 mm|plancha fria 0.9|plancha laminada en frio 0.9,plancha 1.20 x 2.40 m,20.35,22.79,unidad,disponible,2026-10-12
+PF-120,Plancha LAF,Plancha LAF (laminada en frío) 1.2 mm 1.20 x 2.40 m,plancha laf 1.2 mm|plancha negra 1.2 mm|plancha fria 1.2|plancha laminada en frio 1.2,plancha 1.20 x 2.40 m,27.13,30.39,unidad,disponible,2026-10-12
+PF-150,Plancha LAF,"Plancha LAF (laminada en frío) 1.5 mm (1/16"") 1.20 x 2.40 m",plancha laf 1.5 mm|plancha negra 1.5 mm|plancha fria 1.5|plancha laminada en frio 1.5|plancha negra 1/16|plancha laf 1/16|plancha 1/16,plancha 1.20 x 2.40 m,33.91,37.98,unidad,disponible,2026-10-12
+PF-200,Plancha LAF,Plancha LAF (laminada en frío) 2.0 mm 1.20 x 2.40 m,plancha laf 2 mm|plancha negra 2 mm|plancha fria 2|plancha laminada en frio 2,plancha 1.20 x 2.40 m,45.22,50.65,unidad,disponible,2026-10-12
+PC-025,Plancha LAC,Plancha LAC (laminada en caliente) 2.5 mm 1.20 x 2.40 m,plancha lac 2.5 mm|plancha negra 2.5 mm|plancha caliente 2.5|plancha laminada en caliente 2.5,plancha 1.20 x 2.40 m,56.52,57.65,unidad,disponible,2026-10-12
+PC-030,Plancha LAC,"Plancha LAC (laminada en caliente) 3.0 mm (1/8"") 1.20 x 2.40 m",plancha lac 3 mm|plancha negra 3 mm|plancha caliente 3|plancha laminada en caliente 3|plancha negra 1/8|plancha lac 1/8|plancha 1/8,plancha 1.20 x 2.40 m,67.82,69.18,unidad,disponible,2026-10-12
+PC-045,Plancha LAC,"Plancha LAC (laminada en caliente) 4.5 mm (3/16"") 1.20 x 2.40 m",plancha lac 4.5 mm|plancha negra 4.5 mm|plancha caliente 4.5|plancha laminada en caliente 4.5|plancha negra 3/16|plancha lac 3/16|plancha 3/16,plancha 1.20 x 2.40 m,101.74,103.77,unidad,disponible,2026-10-12
+PC-060,Plancha LAC,"Plancha LAC (laminada en caliente) 6.0 mm (1/4"") 1.20 x 2.40 m",plancha lac 6 mm|plancha negra 6 mm|plancha caliente 6|plancha laminada en caliente 6|plancha negra 1/4|plancha lac 1/4|plancha 1/4,plancha 1.20 x 2.40 m,135.65,138.36,unidad,disponible,2026-10-12
+PC-090,Plancha LAC,"Plancha LAC (laminada en caliente) 9.0 mm (3/8"") 1.20 x 2.40 m",plancha lac 9 mm|plancha negra 9 mm|plancha caliente 9|plancha laminada en caliente 9|plancha negra 3/8|plancha lac 3/8|plancha 3/8,plancha 1.20 x 2.40 m,203.47,207.54,unidad,disponible,2026-10-12
+PC-120,Plancha LAC,"Plancha LAC (laminada en caliente) 12.0 mm (1/2"") 1.20 x 2.40 m",plancha lac 12 mm|plancha negra 12 mm|plancha caliente 12|plancha laminada en caliente 12|plancha negra 1/2|plancha lac 1/2|plancha 1/2,plancha 1.20 x 2.40 m,271.30,276.73,unidad,consultar,2026-10-12
+PG-040,Plancha galvanizada,Plancha galvanizada lisa 0.40 mm 1.20 x 2.40 m,plancha galvanizada 0.4|plancha zincada 0.4|plancha galva 0.4,plancha 1.20 x 2.40 m,9.04,12.48,unidad,disponible,2026-10-12
+PG-050,Plancha galvanizada,Plancha galvanizada lisa 0.50 mm 1.20 x 2.40 m,plancha galvanizada 0.5|plancha zincada 0.5|plancha galva 0.5,plancha 1.20 x 2.40 m,11.30,15.59,unidad,disponible,2026-10-12
+PG-090,Plancha galvanizada,Plancha galvanizada lisa 0.90 mm 1.20 x 2.40 m,plancha galvanizada 0.9|plancha zincada 0.9|plancha galva 0.9,plancha 1.20 x 2.40 m,20.35,28.08,unidad,agotado,2026-10-12
+PE-030,Plancha estriada,"Plancha estriada 3.0 mm (1/8"") 1.20 x 2.40 m",plancha estriada 1/8|plancha antideslizante 1/8|plancha estriada 3 mm|plancha diamantada 1/8,plancha 1.20 x 2.40 m,74.61,82.07,unidad,disponible,2026-10-12
+PE-045,Plancha estriada,"Plancha estriada 4.5 mm (3/16"") 1.20 x 2.40 m",plancha estriada 3/16|plancha antideslizante 3/16|plancha estriada 4.5 mm|plancha diamantada 3/16,plancha 1.20 x 2.40 m,108.52,119.37,unidad,consultar,2026-10-12
+TR-0750,Tubo LAC redondo,"Tubo LAC redondo 3/4"" x 1.5 mm x 6 m",tubo redondo 3/4|tubo negro 3/4|tubo lac 3/4,tubo 6 m,3.90,4.68,unidad,disponible,2026-10-12
+TR-1000,Tubo LAC redondo,"Tubo LAC redondo 1"" x 1.5 mm x 6 m",tubo redondo 1 pulg|tubo negro 1 pulg|tubo lac 1 pulg|tubo de una pulgada,tubo 6 m,5.30,6.36,unidad,disponible,2026-10-12
+TR-1500,Tubo LAC redondo,"Tubo LAC redondo 1-1/2"" x 2.0 mm x 6 m",tubo redondo 1-1/2|tubo negro 1-1/2|tubo lac 1-1/2,tubo 6 m,10.68,12.82,unidad,disponible,2026-10-12
+TR-2000,Tubo LAC redondo,"Tubo LAC redondo 2"" x 2.0 mm x 6 m",tubo redondo 2 pulg|tubo negro 2 pulg|tubo lac 2 pulg,tubo 6 m,14.44,17.33,unidad,disponible,2026-10-12
+TC-0750,Tubo LAC cuadrado,"Tubo LAC cuadrado 3/4"" x 3/4"" x 1.2 mm x 6 m",tubo cuadrado 3/4|cuadrado 3/4 x 3/4|tubo cuadrado de 3/4,tubo 6 m,4.04,4.85,unidad,disponible,2026-10-12
+TC-1000,Tubo LAC cuadrado,"Tubo LAC cuadrado 1"" x 1"" x 1.5 mm x 6 m",tubo cuadrado 1 pulg|cuadrado 1 x 1|tubo cuadrado 1 x 1,tubo 6 m,6.75,8.10,unidad,disponible,2026-10-12
+TC-1500,Tubo LAC cuadrado,"Tubo LAC cuadrado 1-1/2"" x 1-1/2"" x 2.0 mm x 6 m",tubo cuadrado 1-1/2|cuadrado 1-1/2 x 1-1/2,tubo 6 m,13.60,16.32,unidad,disponible,2026-10-12
+TC-2000,Tubo LAC cuadrado,"Tubo LAC cuadrado 2"" x 2"" x 2.0 mm x 6 m",tubo cuadrado 2 pulg|cuadrado 2 x 2|tubo cuadrado 2 x 2,tubo 6 m,18.39,22.07,unidad,disponible,2026-10-12
+TT-2010,Tubo LAC rectangular,"Tubo LAC rectangular 2"" x 1"" x 1.5 mm x 6 m",tubo rectangular 2 x 1|rectangular 2 x 1|tubo 2 x 1,tubo 6 m,10.34,12.41,unidad,disponible,2026-10-12
+TT-3010,Tubo LAC rectangular,"Tubo LAC rectangular 3"" x 1"" x 2.0 mm x 6 m",tubo rectangular 3 x 1|rectangular 3 x 1|tubo 3 x 1,tubo 6 m,18.39,22.07,unidad,disponible,2026-10-12
+TT-4020,Tubo LAC rectangular,"Tubo LAC rectangular 4"" x 2"" x 2.0 mm x 6 m",tubo rectangular 4 x 2|rectangular 4 x 2|tubo 4 x 2,tubo 6 m,27.96,33.55,unidad,disponible,2026-10-12
+TG-1000,Tubo galvanizado,"Tubo galvanizado redondo 1"" x 1.5 mm x 6 m",tubo galvanizado 1|tubo galva 1,tubo 6 m,5.46,8.19,unidad,disponible,2026-10-12
+TG-2000,Tubo galvanizado,"Tubo galvanizado redondo 2"" x 2.0 mm x 6 m",tubo galvanizado 2|tubo galva 2,tubo 6 m,14.88,22.32,unidad,disponible,2026-10-12
+AN-1018,Ángulo,"Ángulo 1"" x 1"" x 1/8"" x 6 m",angulo 1 x 1/8|angulo 1 x 1 x 1/8|angular 1 x 1/8,barra 6 m,7.14,7.71,unidad,disponible,2026-10-12
+AN-1518,Ángulo,"Ángulo 1-1/2"" x 1-1/2"" x 1/8"" x 6 m",angulo 1-1/2 x 1/8|angular 1-1/2 x 1/8,barra 6 m,10.98,11.86,unidad,disponible,2026-10-12
+AN-2018,Ángulo,"Ángulo 2"" x 2"" x 1/8"" x 6 m",angulo 2 x 1/8|angulo 2 x 2 x 1/8|angular 2 x 1/8,barra 6 m,14.76,15.94,unidad,disponible,2026-10-12
+AN-2316,Ángulo,"Ángulo 2"" x 2"" x 3/16"" x 6 m",angulo 2 x 3/16|angulo 2 x 2 x 3/16|angular 2 x 3/16,barra 6 m,21.78,23.52,unidad,disponible,2026-10-12
+PL-1018,Platina,"Platina 1"" x 1/8"" x 6 m",platina 1 x 1/8|pletina 1 x 1/8,barra 6 m,3.78,4.08,unidad,disponible,2026-10-12
+PL-1518,Platina,"Platina 1-1/2"" x 1/8"" x 6 m",platina 1-1/2 x 1/8|pletina 1-1/2 x 1/8,barra 6 m,5.70,6.16,unidad,disponible,2026-10-12
+PL-2018,Platina,"Platina 2"" x 1/8"" x 6 m",platina 2 x 1/8|pletina 2 x 1/8,barra 6 m,7.62,8.23,unidad,disponible,2026-10-12
+PL-2014,Platina,"Platina 2"" x 1/4"" x 6 m",platina 2 x 1/4|pletina 2 x 1/4,barra 6 m,15.18,16.39,unidad,disponible,2026-10-12
+CU-0300,Canal y viga,"Canal U 3"" x 6 m",canal 3|canal u 3|canal de 3 pulg|viga u 3,barra 6 m,36.60,40.99,unidad,consultar,2026-10-12
+CU-0400,Canal y viga,"Canal U 4"" x 6 m",canal 4|canal u 4|canal de 4 pulg|viga u 4,barra 6 m,48.24,54.03,unidad,consultar,2026-10-12
+VH-W0615,Canal y viga,Viga H W6 x 15 lb/pie x 6 m,viga h 6|viga w6|viga 6 pulg|viga hache 6,barra 6 m,133.80,149.86,unidad,consultar,2026-09-20

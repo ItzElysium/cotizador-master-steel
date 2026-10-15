@@ -1,0 +1,14 @@
+# Azure Functions
+azure-functions>=1.21
+# Almacenamiento serverless (Table, Blob, Queue) + identidad administrada
+azure-data-tables>=12.5
+azure-storage-blob>=12.20
+azure-storage-queue>=12.10
+azure-identity>=1.17
+# IA (uno de los dos según LLM_PROVEEDOR; se instalan ambos para poder cambiar sin redeploy)
+anthropic>=0.40
+openai>=1.50
+# Utilidades
+requests>=2.31
+reportlab>=4.0
+tzdata>=2024.1
