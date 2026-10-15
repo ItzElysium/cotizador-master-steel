@@ -10,7 +10,7 @@
   Basado en la plantilla oficial "function-app-flex-managed-identities" de Microsoft.
 */
 
-@description('Región. Para Perú suele convenir eastus2 o brazilsouth (verifica soporte de Flex Consumption).')
+@description('Región (debe tener Flex Consumption: az functionapp list-flexconsumption-locations). Para Perú: eastus o brazilsouth.')
 param location string = resourceGroup().location
 
 @description('Prefijo corto para nombrar recursos (solo minúsculas y números).')

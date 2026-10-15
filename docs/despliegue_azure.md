@@ -17,7 +17,23 @@ Table Storage es compatible con **Azure Cosmos DB for Table**. Si el producto es
 - [Azure CLI](https://aka.ms/azcli) (`az login`) y Python 3.11 o superior.
 - Opcional: [Azure Functions Core Tools v4](https://learn.microsoft.com/azure/azure-functions/functions-run-local) (`func`) para publicar desde tu PC. Si no, publica con GitHub Actions.
 
-## Paso a paso
+## Paso a paso en Windows (PowerShell, solo requiere Azure CLI)
+
+```powershell
+az login
+az functionapp list-flexconsumption-locations -o table        # regiones con Flex Consumption
+Copy-Item infra\.env.example infra\.env
+notepad infra\.env                                             # completar empresa, admins, claves
+powershell -ExecutionPolicy Bypass -File infra\deploy.ps1 -Grupo rg-cotizador-acero -Region eastus
+```
+
+Para actualizar solo el código después de un cambio: `... infra\deploy.ps1 -Grupo rg-cotizador-acero -SoloCodigo`.
+
+> **Suscripciones Azure for Students:** solo permiten desplegar en algunas regiones (política *Allowed resource deployment regions*). Para verlas:
+> `az policy assignment list --disable-scope-strict-match --query "[?parameters.listOfAllowedLocations].parameters.listOfAllowedLocations.value" -o json`
+> Elige una que también tenga Flex Consumption (por ejemplo `eastus`). Úsala solo para pruebas: sus condiciones no permiten dar servicio a terceros y se deshabilita cuando se acaba el crédito.
+
+## Paso a paso en macOS / Linux (bash)
 
 ```bash
 az login
@@ -30,7 +46,7 @@ az functionapp list-flexconsumption-locations -o table
 cp infra/.env.example infra/.env      # completar empresa, admins, claves
 
 # 3. Infraestructura + código
-./infra/deploy.sh rg-cotizador-acero eastus2
+./infra/deploy.sh rg-cotizador-acero eastus
 ```
 
 El script imprime la URL del webhook (para Meta), la URL de salud y el comando para obtener la clave de administración.

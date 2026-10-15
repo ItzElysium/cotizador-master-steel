@@ -80,7 +80,7 @@ En el simulador puedes escribir como cliente ("hola, cuánto está el fierro de 
 
 ## Despliegue
 
-1. **Azure:** `cp infra/.env.example infra/.env` → completar → `./infra/deploy.sh rg-cotizador-acero eastus2`. Ver [docs/despliegue_azure.md](docs/despliegue_azure.md).
+1. **Azure:** copiar `infra/.env.example` a `infra/.env` y completarlo. Luego, en Windows: `powershell -ExecutionPolicy Bypass -File infra\deploy.ps1 -Region eastus`; en macOS/Linux: `./infra/deploy.sh rg-cotizador-acero eastus`. Ver [docs/despliegue_azure.md](docs/despliegue_azure.md).
 2. **WhatsApp (Meta):** crear la app, obtener el token permanente y registrar el webhook. Ver [docs/configurar_whatsapp.md](docs/configurar_whatsapp.md).
 3. **Lista de precios:** completar `data/plantilla_lista_precios.xlsx` y subirla con `scripts/cargar_catalogo.py`.
 4. **CI/CD:** cada push a `main` corre las pruebas y despliega con GitHub Actions (OIDC, sin contraseñas).
