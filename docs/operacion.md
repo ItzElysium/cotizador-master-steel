@@ -43,7 +43,7 @@ Los mensajes del vendedor que **no** empiezan con `/` se tratan como si fuera un
 
 ## Reportes (Excel / Power BI)
 
-- Cabeceras: `GET https://<app>.azurewebsites.net/api/admin/cotizaciones?code=<clave>`
-- Detalle por producto: `…/api/admin/cotizaciones?detalle=1&code=<clave>`
+- Cabeceras: `GET https://<app>.azurewebsites.net/api/gestion/cotizaciones?code=<clave>`
+- Detalle por producto: `…/api/gestion/cotizaciones?detalle=1&code=<clave>`
 
 En Power BI: *Obtener datos → Web* con esa URL. Métricas sugeridas: cotizaciones por día, monto cotizado vs. ganado, tasa de cierre por tipo de cliente, kg por familia de producto, motivos de pérdida y tiempo hasta el cierre.

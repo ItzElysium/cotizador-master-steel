@@ -5,8 +5,9 @@
   timer    08:00 Lima              -> actualiza el tipo de cambio del BCRP
   GET      /api/salud              -> chequeo rápido
   GET      /api/privacidad         -> política de privacidad pública (requisito de Meta para publicar la app)
-  GET      /api/admin/cotizaciones -> CSV para Excel / Power BI   (requiere clave de función)
-  GET/POST /api/admin/catalogo     -> descargar / cargar la lista de precios (requiere clave de función)
+  GET      /api/gestion/cotizaciones -> CSV para Excel / Power BI   (requiere clave de función)
+  GET/POST /api/gestion/catalogo     -> descargar / cargar la lista de precios (requiere clave de función)
+  (No se usa el prefijo "admin": Azure Functions lo reserva para su API interna y la ruta no carga.)
 """
 from __future__ import annotations
 
@@ -102,7 +103,7 @@ def privacidad(req: func.HttpRequest) -> func.HttpResponse:
     return func.HttpResponse(pagina_privacidad(cargar_config()), mimetype="text/html", charset="utf-8")
 
 
-@app.route(route="admin/cotizaciones", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
+@app.route(route="gestion/cotizaciones", methods=["GET"], auth_level=func.AuthLevel.FUNCTION)
 def exportar_cotizaciones(req: func.HttpRequest) -> func.HttpResponse:
     detalle = req.params.get("detalle", "0") in {"1", "true", "si"}
     csv_texto = servicio().exportar_csv(detalle=detalle)
@@ -111,7 +112,7 @@ def exportar_cotizaciones(req: func.HttpRequest) -> func.HttpResponse:
                              headers={"Content-Disposition": f"attachment; filename={nombre}"})
 
 
-@app.route(route="admin/catalogo", methods=["GET", "POST"], auth_level=func.AuthLevel.FUNCTION)
+@app.route(route="gestion/catalogo", methods=["GET", "POST"], auth_level=func.AuthLevel.FUNCTION)
 def catalogo(req: func.HttpRequest) -> func.HttpResponse:
     s = servicio()
     if req.method == "GET":

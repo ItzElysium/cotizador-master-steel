@@ -237,3 +237,11 @@ def test_ruta_de_privacidad_responde_html():
     r = function_app.privacidad(func.HttpRequest("GET", "/api/privacidad", body=b""))
     assert r.status_code == 200 and r.mimetype == "text/html"
     assert "Política de privacidad" in r.get_body().decode("utf-8")
+
+
+def test_ninguna_ruta_usa_el_prefijo_reservado_admin():
+    # Azure Functions reserva /admin para su API interna: una ruta "admin/..." no carga en Azure.
+    from pathlib import Path
+
+    codigo = (Path(__file__).resolve().parent.parent / "function_app.py").read_text(encoding="utf-8")
+    assert 'route="admin' not in codigo

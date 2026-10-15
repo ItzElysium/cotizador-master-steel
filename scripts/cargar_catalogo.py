@@ -50,7 +50,7 @@ def main() -> None:
             return
     if not (args.url and args.clave):
         sys.exit("Indica --url y --clave para subir, o usa --validar.")
-    r = requests.post(f"{args.url.rstrip('/')}/api/admin/catalogo", params={"reemplazar": int(args.reemplazar)},
+    r = requests.post(f"{args.url.rstrip('/')}/api/gestion/catalogo", params={"reemplazar": int(args.reemplazar)},
                       headers={"x-functions-key": args.clave, "Content-Type": "text/csv; charset=utf-8"},
                       data=texto.encode("utf-8"), timeout=60)
     print(r.status_code, r.text)
