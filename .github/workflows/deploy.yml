@@ -33,6 +33,8 @@ jobs:
 
   desplegar:
     needs: pruebas
+    # Se omite (sin error) hasta que configures la variable AZURE_FUNCTIONAPP_NAME en GitHub
+    if: ${{ vars.AZURE_FUNCTIONAPP_NAME != '' }}
     runs-on: ubuntu-latest
     environment: produccion
     steps:
