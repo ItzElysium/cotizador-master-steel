@@ -31,7 +31,8 @@ class Agente:
                 uso_total[k] = uso_total.get(k, 0) + v
             mensajes.append({
                 "rol": "asistente", "texto": respuesta.texto,
-                "llamadas": [{"id": ll.id, "nombre": ll.nombre, "argumentos": ll.argumentos} for ll in respuesta.llamadas],
+                "llamadas": [{"id": ll.id, "nombre": ll.nombre, "argumentos": ll.argumentos,
+                              **({"extra": ll.extra} if ll.extra else {})} for ll in respuesta.llamadas],
             })
             if not respuesta.llamadas:
                 break

@@ -33,6 +33,9 @@ class LlamadaHerramienta:
     id: str
     nombre: str
     argumentos: dict[str, Any]
+    # Metadatos del proveedor que hay que devolver tal cual en la siguiente llamada. Gemini 3 manda aquí
+    # su "thought_signature" y responde 400 si no se le devuelve.
+    extra: dict[str, Any] | None = None
 
 
 @dataclass
@@ -68,6 +71,29 @@ MODELOS_RESPALDO: dict[str, str] = {"gemini": "gemini-3.5-flash-lite"}
 SEGUNDOS_PAUSA_PRINCIPAL = 600
 _ESTADOS_SATURACION = {408, 429, 500, 502, 503, 504, 529}
 _pausados_hasta: dict[str, float] = {}
+
+
+# Firma comodín que Gemini acepta cuando la firma real viene de otro modelo (p. ej. al pasar al respaldo a
+# mitad de un turno): las firmas solo son válidas para el modelo que las generó.
+FIRMA_COMODIN = "skip_thought_signature_validator"
+
+
+def _con_firmas_comodin(mensajes: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Pone la firma comodín en la primera llamada de cada paso (donde Gemini la exige)."""
+    salida = []
+    for m in mensajes:
+        if m.get("role") == "assistant" and m.get("tool_calls"):
+            primera, *resto = m["tool_calls"]
+            extra = primera.get("extra_content") or {}
+            primera = {**primera, "extra_content": {**extra, "google": {**(extra.get("google") or {}),
+                                                                          "thought_signature": FIRMA_COMODIN}}}
+            m = {**m, "tool_calls": [primera, *resto]}
+        salida.append(m)
+    return salida
+
+
+def _es_error_de_firma(exc: Exception) -> bool:
+    return getattr(exc, "status_code", None) == 400 and "signature" in str(exc).lower()
 
 
 def _es_saturacion(exc: Exception) -> bool:
@@ -164,19 +190,29 @@ class LLMFormatoOpenAI:
 
     def _crear(self, **kwargs: Any) -> Any:
         """Llama al modelo principal; si está saturado y hay respaldo, responde con el respaldo."""
-        if not self.modelo_respaldo:
-            return self.cliente.chat.completions.create(model=self.modelo, **kwargs)
-        if time.monotonic() < _pausados_hasta.get(self.modelo, 0):
-            return self.cliente.chat.completions.create(model=self.modelo_respaldo, **kwargs)
+        if self.modelo_respaldo and time.monotonic() < _pausados_hasta.get(self.modelo, 0):
+            return self._llamar(self.modelo_respaldo, kwargs)
         try:
-            return self.cliente.chat.completions.create(model=self.modelo, **kwargs)
+            return self._llamar(self.modelo, kwargs)
         except Exception as exc:
-            if not _es_saturacion(exc):
+            if not self.modelo_respaldo or not _es_saturacion(exc):
                 raise
             log.warning("Modelo %s no disponible (%s); se usa %s por %s min", self.modelo, exc,
                         self.modelo_respaldo, SEGUNDOS_PAUSA_PRINCIPAL // 60)
             _pausados_hasta[self.modelo] = time.monotonic() + SEGUNDOS_PAUSA_PRINCIPAL
-            return self.cliente.chat.completions.create(model=self.modelo_respaldo, **kwargs)
+            # Las firmas de razonamiento solo valen para el modelo que las generó.
+            return self._llamar(self.modelo_respaldo, {**kwargs, "messages": _con_firmas_comodin(kwargs["messages"])})
+
+    def _llamar(self, modelo: str, kwargs: dict[str, Any]) -> Any:
+        try:
+            return self.cliente.chat.completions.create(model=modelo, **kwargs)
+        except Exception as exc:
+            if not _es_error_de_firma(exc):
+                raise
+            # Gemini 3 rechazó una firma de razonamiento (faltante o de otro modelo): un reintento con la comodín.
+            log.warning("%s rechazó la firma de razonamiento (%s); reintento con firma comodín", modelo, exc)
+            return self.cliente.chat.completions.create(
+                model=modelo, **{**kwargs, "messages": _con_firmas_comodin(kwargs["messages"])})
 
     @staticmethod
     def convertir(sistema: str | list[str], mensajes: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -198,10 +234,14 @@ class LLMFormatoOpenAI:
                 msg: dict[str, Any] = {"role": "assistant",
                                        "content": m.get("texto") or (None if m.get("llamadas") else "...")}
                 if m.get("llamadas"):
-                    msg["tool_calls"] = [{"id": ll["id"], "type": "function",
-                                          "function": {"name": ll["nombre"],
-                                                       "arguments": json.dumps(ll["argumentos"], ensure_ascii=False)}}
-                                         for ll in m["llamadas"]]
+                    msg["tool_calls"] = []
+                    for ll in m["llamadas"]:
+                        tc: dict[str, Any] = {"id": ll["id"], "type": "function",
+                                              "function": {"name": ll["nombre"],
+                                                           "arguments": json.dumps(ll["argumentos"], ensure_ascii=False)}}
+                        if ll.get("extra"):
+                            tc["extra_content"] = ll["extra"]  # firma de Gemini 3, se devuelve tal cual
+                        msg["tool_calls"].append(tc)
                 salida.append(msg)
             else:
                 for r in m["resultados"]:
@@ -229,7 +269,9 @@ class LLMFormatoOpenAI:
                 argumentos = json.loads(tc.function.arguments or "{}")
             except json.JSONDecodeError:
                 argumentos = {}
-            llamadas.append(LlamadaHerramienta(tc.id, tc.function.name, argumentos))
+            extra = getattr(tc, "extra_content", None)
+            llamadas.append(LlamadaHerramienta(tc.id, tc.function.name, argumentos,
+                                               extra if isinstance(extra, dict) and extra else None))
         uso = {}
         if getattr(r, "usage", None):
             uso = {"entrada": r.usage.prompt_tokens or 0, "salida": r.usage.completion_tokens or 0}

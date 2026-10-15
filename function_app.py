@@ -21,6 +21,11 @@ from cotizador.catalogo import a_csv
 from cotizador.privacidad import pagina_privacidad
 from cotizador.whatsapp import verificar_firma
 
+# Las librerías de Azure y de IA registran cada petición HTTP a nivel INFO: ese ruido llenaba Application
+# Insights y el muestreo terminaba descartando los errores del bot.
+for _ruidoso in ("azure", "httpx", "httpcore", "openai", "anthropic", "urllib3"):
+    logging.getLogger(_ruidoso).setLevel(logging.WARNING)
+
 app = func.FunctionApp()
 _servicio = None
 

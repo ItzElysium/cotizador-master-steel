@@ -60,7 +60,7 @@ data/
   plantilla_lista_precios.xlsx    Plantilla que llena el cliente
 infra/                   Bicep (Flex Consumption + Storage + identidad) y deploy.sh
 scripts/                 Simulador de chat, PDF demo, carga de catálogo, plantilla Excel
-tests/                   74 pruebas (unitarias, flujo completo, robustez e integración con Azurite)
+tests/                   76 pruebas (unitarias, flujo completo, robustez e integración con Azurite)
 docs/                    Arquitectura, WhatsApp/Meta, despliegue y operación
 ```
 

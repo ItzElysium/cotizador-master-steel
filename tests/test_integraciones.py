@@ -245,3 +245,67 @@ def test_ninguna_ruta_usa_el_prefijo_reservado_admin():
 
     codigo = (Path(__file__).resolve().parent.parent / "function_app.py").read_text(encoding="utf-8")
     assert 'route="admin' not in codigo
+
+
+def test_gemini3_recibe_de_vuelta_su_firma_de_razonamiento(monkeypatch):
+    """Gemini 3 responde 400 si la llamada a herramienta no vuelve con su thought_signature."""
+    from types import SimpleNamespace as N
+
+    from cotizador import llm as modulo
+    from cotizador.agente import Agente
+
+    firma = {"google": {"thought_signature": "FIRMA-REAL"}}
+
+    class Completions:
+        def __init__(self):
+            self.pedidos = []
+
+        def create(self, **kwargs):
+            self.pedidos.append(kwargs)
+            if len(self.pedidos) == 1:
+                llamada = N(id="c1", function=N(name="buscar_productos", arguments='{"consulta": "fierro 1/2"}'),
+                            extra_content=firma)
+                return N(choices=[N(finish_reason="tool_calls", message=N(content=None, tool_calls=[llamada]))],
+                         usage=None)
+            return N(choices=[N(finish_reason="stop", message=N(content="El fierro de 1/2 está a US$ 8.95", tool_calls=None))],
+                     usage=None)
+
+    monkeypatch.setattr(modulo, "_pausados_hasta", {})
+    completions = Completions()
+    llm = modulo.LLMFormatoOpenAI(N(chat=N(completions=completions)), "gemini-3.8-flash", 500)
+    agente = Agente(llm, [{"nombre": "buscar_productos", "descripcion": "d", "parametros": {"type": "object"}}])
+    texto, historial, _ = agente.responder("s", [], [{"tipo": "texto", "texto": "fierro de media"}], lambda n, a: "{}")
+
+    assert texto.startswith("El fierro")
+    asistente = [m for m in completions.pedidos[1]["messages"] if m["role"] == "assistant"][0]
+    assert asistente["tool_calls"][0]["extra_content"] == firma  # se devolvió tal cual
+    assert historial[1]["llamadas"][0]["extra"] == firma  # y queda en el historial guardado
+
+
+def test_firma_rechazada_se_reintenta_con_comodin(monkeypatch):
+    from types import SimpleNamespace as N
+
+    from cotizador import llm as modulo
+
+    class ErrorFirma(Exception):
+        status_code = 400
+
+    class Completions:
+        def __init__(self):
+            self.pedidos = []
+
+        def create(self, **kwargs):
+            self.pedidos.append(kwargs)
+            if len(self.pedidos) == 1:
+                raise ErrorFirma("Function call is missing a thought_signature in functionCall parts")
+            return N(choices=[N(finish_reason="stop", message=N(content="ok", tool_calls=None))], usage=None)
+
+    monkeypatch.setattr(modulo, "_pausados_hasta", {})
+    completions = Completions()
+    llm = modulo.LLMFormatoOpenAI(N(chat=N(completions=completions)), "gemini-3.8-flash", 500)
+    historial = NEUTRO + [{"rol": "asistente", "texto": "", "llamadas": [
+        {"id": "c1", "nombre": "buscar_productos", "argumentos": {}}]},
+        {"rol": "herramienta", "resultados": [{"id": "c1", "nombre": "buscar_productos", "contenido": "{}"}]}]
+    assert llm.completar("s", historial, []).texto == "ok"
+    reintento = [m for m in completions.pedidos[1]["messages"] if m.get("tool_calls")][-1]
+    assert reintento["tool_calls"][0]["extra_content"]["google"]["thought_signature"] == modulo.FIRMA_COMODIN
